@@ -38,7 +38,7 @@ if ( !class_exists( "sp_secure_post" ) ) {
     var $optionsMenuTitle = '';
 
     public function __construct() {
-      global $post;
+      
       $this->pluginURL = plugin_dir_url( __FILE__ );
       $this->pluginPath = plugin_dir_path( __FILE__ );
       $this->optionsPageTitle = __( 'Secure Post', 'sp' );
@@ -49,21 +49,35 @@ if ( !class_exists( "sp_secure_post" ) ) {
     }
 
     public function secure_post_content( $content ) {
-
-      if ( is_user_logged_in() ) {
+      global $post;
+      $cat_id = get_the_category($post->ID);
+      //var_dump($cat_id);
+      
+      if ( is_user_logged_in() ) { // if user logged in show content.
         return $content;
       } else {
         $options = get_option( $this->options, true );
+        foreach ( $options as $key => $option ) {
+          if ( $option == 'yes' ) {
+            $cat[] = $key;
+          }
+        }
         if ( is_single() || is_archive() || is_search() ) {
-          if ( isset( $options['message'] ) && $options['message'] != "" ) {
-            return $options['message'];
-          } else {
-            return 'To view the content please login.';
+          //var_dump( $cat );
+          if ( in_array( $cat_id[0]->cat_ID, $cat ) ) {
+            if ( isset( $options['message'] ) && $options['message'] != "" ) {
+              return $options['message'];
+            } else {
+              return 'To view the content please login.';
+            }
+          }else{
+            return $content;
           }
         } else {
           return $content;
         }
       }
+      
     }
 
     public function optionsPage() {
