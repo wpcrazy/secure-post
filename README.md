@@ -1,0 +1,1 @@
+Simple Secure Post by Category Plugin for WordPress
